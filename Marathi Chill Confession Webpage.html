@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>जास्त काही नाही... मला तू आवडतेस! 🙈</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Noto Sans Devanagari & Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Canvas Confetti for Celebration Effect -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+      touch-action: manipulation;
+    }
+
+    /* Floating background hearts animation */
+    @keyframes floatUp {
+      0% {
+        transform: translateY(110vh) scale(0.6) rotate(0deg);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.7;
+      }
+      80% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .floating-heart {
+      position: absolute;
+      bottom: -40px;
+      user-select: none;
+      pointer-events: none;
+      animation: floatUp linear infinite;
+    }
+
+    /* Pulse glow effect for primary button */
+    .glow-pulse {
+      box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5);
+      animation: pulseShadow 2s infinite;
+    }
+
+    @keyframes pulseShadow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.45);
+      }
+      70% {
+        box-shadow: 0 0 0 16px rgba(244, 63, 94, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+      }
+    }
+
+    /* Spring-loaded dodge motion for No button */
+    .dodge-transition {
+      transition: left 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  top 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.15s ease-out;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen w-full bg-gradient-to-tr from-rose-100 via-pink-100 to-amber-50 flex items-center justify-center p-4 relative overflow-hidden text-slate-800 selection:bg-rose-200">
+
+  <!-- Ambient floating decorative background elements -->
+  <div id="heart-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true"></div>
+
+  <!-- Soft background blur spheres -->
+  <div class="fixed -top-24 -left-24 w-80 h-80 rounded-full bg-pink-300/40 blur-3xl pointer-events-none"></div>
+  <div class="fixed -bottom-24 -right-24 w-96 h-96 rounded-full bg-rose-200/50 blur-3xl pointer-events-none"></div>
+
+  <!-- Main Card Container -->
+  <main class="relative z-10 w-full max-w-md mx-auto">
+    <div id="confession-card" class="bg-white/85 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_rgba(244,63,94,0.15)] rounded-3xl p-6 sm:p-9 text-center transition-all duration-500 transform hover:shadow-[0_25px_60px_rgba(244,63,94,0.22)]">
+
+      <!-- Question State Content -->
+      <div id="question-state" class="transition-opacity duration-300">
+        
+        <!-- Header Tag -->
+        <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-100/90 text-rose-700 text-xs sm:text-sm font-semibold tracking-wide mb-5">
+          <span class="animate-spin text-xs">✨</span>
+          <span>फक्त मनातलं सांगायचंय</span>
+          <span class="animate-spin text-xs">✨</span>
+        </div>
+
+        <!-- Fun Emoticon Hero -->
+        <div class="relative w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+          <div class="absolute inset-0 bg-pink-100 rounded-full scale-110 animate-ping opacity-25"></div>
+          <div class="relative text-6xl select-none filter drop-shadow-md hover:scale-110 transition-transform duration-200" id="hero-emoji">
+            🙈
+          </div>
+        </div>
+
+        <!-- Big Punchy Marathi Headline -->
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 leading-snug tracking-tight mb-3">
+          जास्त काही नाही... <br>
+          <span class="bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">
+            मला तू आवडतेस!
+          </span>
+          <span class="inline-block hover:rotate-12 transition-transform">बस एवढंच</span>
+        </h1>
+
+        <!-- Relaxed, pressure-free Marathi Subtext -->
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 px-2 font-medium">
+          कोणतंही मोठं प्रॉमिस नाही, जास्त लोड नको घेऊ... फक्त मनातलं सांगून टाकलं! आता तुझं काय मत आहे? 😉
+        </p>
+
+        <!-- Interactive Buttons Container -->
+        <div class="relative min-h-[74px] flex items-center justify-center gap-4 flex-wrap">
+          
+          <!-- YES Button ('मला पण! 🥰') -->
+          <button 
+            id="yes-btn"
+            onclick="handleAcceptance()"
+            class="glow-pulse bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-base sm:text-lg px-7 py-3.5 rounded-full shadow-lg shadow-rose-500/30 transform active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer z-10"
+          >
+            <span>मला पण!</span>
+            <span class="text-xl">🥰</span>
+          </button>
+
+          <!-- NO Button ('नाही 🙄' - The Dodging Button) -->
+          <button 
+            id="no-btn"
+            onpointerover="dodgeNoButton(event)"
+            onpointerdown="dodgeNoButton(event)"
+            class="dodge-transition bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-full border border-slate-300 shadow-sm active:scale-95 transition-colors cursor-pointer select-none z-20"
+          >
+            <span>नाही</span>
+            <span>🙄</span>
+          </button>
+        </div>
+
+        <!-- Playful Dodge Hint -->
+        <p id="dodge-hint" class="text-xs text-rose-400 font-medium mt-6 h-4 transition-all duration-200 opacity-0">
+          (इथे 'नाही' म्हणायला नो स्कोप! 😜)
+        </p>
+
+      </div>
+
+      <!-- Success / Acceptance View (Initially Hidden) -->
+      <div id="success-state" class="hidden opacity-0 transform scale-95 transition-all duration-500">
+        
+        <!-- Victory Badge -->
+        <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs sm:text-sm font-bold tracking-wide mb-4">
+          <span>🤝</span>
+          <span>डील फायनल!</span>
+        </div>
+
+        <!-- Success Animation Icon -->
+        <div class="text-7xl mb-4 select-none animate-bounce">
+          😎✨
+        </div>
+
+        <!-- Victory Headline -->
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">
+          विषय संपला! ❤️
+        </h2>
+
+        <!-- Funny Marathi Closure -->
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 font-medium px-2">
+          एवढंच सांगायचं होतं, उगाच जास्त सस्पेन्स नाही ठेवला.<br class="hidden sm:inline"> 
+          आता चल, <strong>चहा</strong> किंवा <strong>पाणीपुरी</strong> कधी खायची ते ठरव! ☕🧆
+        </p>
+
+        <!-- Direct Action Buttons -->
+        <div class="flex flex-col gap-3">
+          <a 
+            id="whatsapp-link"
+            href="https://wa.me/?text=%E0%A4%AE%E0%A4%B2%E0%A4%BE%20%E0%A4%AA%E0%A4%A3%20%E0%A4%A4%E0%A5%82%20%E0%A4%86%E0%A4% Jag...%20%E0%A4%9A%E0%A4%B2%20%E0%A4%9A%E0%A4%B9%E0%A4%BE%20%E0%A4%AA%E0%A5%8D%E0%A4%AF%E0%A4%BE%E0%A4%AF%E0%A4%B2%E0%A4%BE%20%E0%A4%95%E0%A4%A7%E0%A5%80%20%E0%A4%9C%E0%A4%BE%E0%A4%AF%E0%A4%9A%E0%A4%82%3F%20%F0%9F%98%89%E2%98%95"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full inline-flex items-center justify-center gap-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base py-3.5 px-6 rounded-2xl shadow-lg shadow-emerald-500/30 transform active:scale-98 transition-all duration-200"
+          >
+            <!-- WhatsApp SVG Icon -->
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.149.929 3.182 0 5.77-2.587 5.77-5.766.001-3.187-2.575-5.771-5.77-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.288.043.088.072.19.014.305-.058.115-.087.187-.173.289l-.26.309c-.087.086-.179.18-.077.355.101.173.449.741.964 1.2.662.591 1.221.774 1.394.86.173.086.275.072.376-.043.101-.116.433-.506.549-.679.116-.173.231-.145.39-.086.159.058 1.011.477 1.184.564.173.087.289.13.332.202.043.073.043.419-.101.824z"/>
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.662 1.435 5.178L2 22l4.981-1.309A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.167c-1.637 0-3.155-.494-4.42-1.341l-.317-.212-2.96.777.79-2.884-.233-.371A8.14 8.14 0 013.833 12c0-4.503 3.664-8.167 8.167-8.167 4.503 0 8.167 3.664 8.167 8.167 0 4.503-3.664 8.167-8.167 8.167z"/>
+            </svg>
+            <span>WhatsApp वर सांग 💬</span>
+          </a>
+
+          <!-- Subtle copy-to-clipboard button -->
+          <button 
+            id="copy-btn"
+            onclick="copyCuteMessage()"
+            class="text-xs text-slate-500 hover:text-slate-700 py-2 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span id="copy-text">मेसेज कॉपी कर</span>
+            <span>📋</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Small footer note -->
+    <p class="text-center text-xs text-slate-500 mt-5 font-medium tracking-wide">
+      Made with 100% गोडवा & शून्य प्रेशर ❤️
+    </p>
+  </main>
+
+  <script>
+    /* -------------------------------------------------------------
+     * 1. Web Audio API (Synthesized Effects - No external assets)
+     * ------------------------------------------------------------- */
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Playful bubbly pop when dodging
+    function playDodgePop() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        const randomPitch = 380 + Math.random() * 220;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(randomPitch, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(randomPitch * 1.6, ctx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(0.18, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.09);
+      } catch (e) {
+        // Audio policy or silent fallback
+      }
+    }
+
+    // Joyful sweet chime when accepted
+    function playVictoryChime() {
+      try {
+        const ctx = getAudioContext();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+
+          gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.1);
+          gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + idx * 0.1 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.5);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(ctx.currentTime + idx * 0.1);
+          osc.stop(ctx.currentTime + idx * 0.1 + 0.55);
+        });
+      } catch (e) {
+        // Fallback gracefully
+      }
+    }
+
+    /* -------------------------------------------------------------
+     * 2. Floating Heart Particles Generator
+     * ------------------------------------------------------------- */
+    const heartEmojis = ['💖', '🌸', '✨', '💕', '🥰', '🌷'];
+    const heartContainer = document.getElementById('heart-container');
+
+    function createFloatingHeart() {
+      if (!heartContainer) return;
+      const el = document.createElement('span');
+      el.className = 'floating-heart';
+      el.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+      
+      const left = Math.random() * 100;
+      const duration = 6 + Math.random() * 6; // 6s - 12s
+      const size = 16 + Math.random() * 20; // 16px - 36px
+
+      el.style.left = `${left}vw`;
+      el.style.animationDuration = `${duration}s`;
+      el.style.fontSize = `${size}px`;
+
+      heartContainer.appendChild(el);
+
+      setTimeout(() => {
+        el.remove();
+      }, duration * 1000);
+    }
+
+    // Initial batch + interval
+    for (let i = 0; i < 7; i++) {
+      setTimeout(createFloatingHeart, i * 400);
+    }
+    setInterval(createFloatingHeart, 1800);
+
+    /* -------------------------------------------------------------
+     * 3. Dodging "नाही" Button Logic
+     * ------------------------------------------------------------- */
+    const noBtn = document.getElementById('no-btn');
+    const yesBtn = document.getElementById('yes-btn');
+    const dodgeHint = document.getElementById('dodge-hint');
+    const heroEmoji = document.getElementById('hero-emoji');
+
+    const wittyMarathiQuotes = [
+      "अरे असा कसा नाही? 🤨",
+      "आधी पकडून दाखव बघू! 😂",
+      "नाहीचा ऑप्शनच बंद केलाय मी! 🚫",
+      "इतका भाव नको खाऊस! 😜",
+      "बस, आता हार मान आणि 'हो' बोल! 🥳",
+      "चहा पाजतो, आता तरी 'हो' म्हण! ☕",
+      "बटण पळालं, आता फक्त 'मला पण' उरलंय! 😎"
+    ];
+
+    const playfulEmojis = ['🙈', '👀', '🏃‍♂️', '😜', '🤭', '✨'];
+
+    let dodgeCount = 0;
+    let yesScale = 1;
+
+    function dodgeNoButton(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      playDodgePop();
+      dodgeCount++;
+
+      // Change button text to witty Marathi banter
+      const quoteIndex = (dodgeCount - 1) % wittyMarathiQuotes.length;
+      noBtn.innerHTML = `<span>${wittyMarathiQuotes[quoteIndex]}</span>`;
+
+      // Cycle hero emoji to match funny reaction
+      if (heroEmoji) {
+        heroEmoji.innerText = playfulEmojis[dodgeCount % playfulEmojis.length];
+      }
+
+      // Show hint after first attempt
+      if (dodgeHint) {
+        dodgeHint.style.opacity = '1';
+      }
+
+      // Dynamically grow the Yes button so it gets impossible to miss!
+      yesScale = Math.min(yesScale + 0.1, 1.6);
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      // Calculate dynamic viewport safe bounds
+      const btnRect = noBtn.getBoundingClientRect();
+      const padding = 24;
+      const maxX = window.innerWidth - btnRect.width - padding;
+      const maxY = window.innerHeight - btnRect.height - padding;
+
+      // Ensure button switches to fixed positioning once it begins dodging
+      noBtn.style.position = 'fixed';
+      noBtn.style.zIndex = '50';
+
+      // Pick a smart target distance away from current position
+      const randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
+      const randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+
+      noBtn.style.left = `${Math.max(padding, randomX)}px`;
+      noBtn.style.top = `${Math.max(padding, randomY)}px`;
+
+      // Subtle tilt rotation
+      const randomRot = (Math.random() - 0.5) * 20;
+      noBtn.style.transform = `rotate(${randomRot}deg)`;
+    }
+
+    /* -------------------------------------------------------------
+     * 4. Acceptance Event & Confetti
+     * ------------------------------------------------------------- */
+    function handleAcceptance() {
+      playVictoryChime();
+
+      // Trigger Confetti Explosion
+      if (typeof confetti === 'function') {
+        // Center burst
+        confetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#f43f5e', '#ec4899', '#fb7185', '#fda4af', '#fcd34d']
+        });
+
+        // Left fountain
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ['#e11d48', '#fb7185', '#34d399']
+          });
+        }, 200);
+
+        // Right fountain
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ['#e11d48', '#fb7185', '#38bdf8']
+          });
+        }, 350);
+      }
+
+      // Hide dodging button if it was roaming around
+      noBtn.style.display = 'none';
+
+      // Smooth view transition
+      const questionState = document.getElementById('question-state');
+      const successState = document.getElementById('success-state');
+
+      questionState.style.opacity = '0';
+
+      setTimeout(() => {
+        questionState.classList.add('hidden');
+        successState.classList.remove('hidden');
+
+        // Reveal success screen with smooth pop
+        setTimeout(() => {
+          successState.classList.remove('opacity-0', 'scale-95');
+          successState.classList.add('opacity-100', 'scale-100');
+        }, 50);
+      }, 300);
+    }
+
+    /* -------------------------------------------------------------
+     * 5. Fallback Copy to Clipboard
+     * ------------------------------------------------------------- */
+    function copyCuteMessage() {
+      const textToCopy = "मला पण तू आवडतोस रे! 😉 चल चहा प्यायला कधी जायचं?";
+      const copyTextEl = document.getElementById('copy-text');
+
+      // Uses execCommand or textarea trick for maximum sandbox compatibility
+      const tempInput = document.createElement('textarea');
+      tempInput.value = textToCopy;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      
+      try {
+        document.execCommand('copy');
+        if (copyTextEl) {
+          copyTextEl.innerText = "कॉपी झाला! ✅";
+          setTimeout(() => {
+            copyTextEl.innerText = "मेसेज कॉपी कर";
+          }, 2500);
+        }
+      } catch (err) {
+        if (copyTextEl) copyTextEl.innerText = "कॉपी नाही झाला 😅";
+      } finally {
+        document.body.removeChild(tempInput);
+      }
+    }
+  </script>
+</body>
+</html>
